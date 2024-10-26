@@ -1,18 +1,27 @@
 package com.aarteaga.ms_exchange.service;
 
+import com.aarteaga.ms_exchange.client.ExchangeRateClient;
+import com.aarteaga.ms_exchange.model.Exchange;
 import com.aarteaga.ms_exchange.model.Transaction;
 import com.aarteaga.ms_exchange.repository.TransactionRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class TransactionServiceImpl implements TransactionService{
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    ExchangeRateClient exchangeRateClient;
 
     @Override
     public List<Transaction> findAll() {
@@ -20,15 +29,16 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
     @Override
-    public Transaction create(Transaction transaction) {
-        //TODO Get list of exchange rate in base of originCurrency
+    public Transaction create(Transaction transaction) throws JsonProcessingException {
 
-        String originCurrency = transaction.getOriginCurrency();
+        Exchange exchange = exchangeRateClient.getExchangeByCurrency(transaction.getOriginCurrency());
+        log.info("RATES:  " + exchange.getRates());
 
-        //TODO GET OF RATES DESTINY CURRENCY
-        String destinyCurrency = transaction.getDestinyCurrency();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonRates = objectMapper.writeValueAsString(exchange.getRates());
+        Double exchangeRate = objectMapper.readTree(jsonRates).get(transaction.getDestinyCurrency()).asDouble();
 
-        Double exchangeRate = 3.76;
+        log.info("RATE:  " + exchangeRate);
 
         Double finalAmount = transaction.getInitialAmount() * exchangeRate;
         transaction.setFinalAmount(finalAmount);

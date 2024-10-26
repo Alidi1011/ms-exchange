@@ -2,6 +2,7 @@ package com.aarteaga.ms_exchange.controller;
 
 import com.aarteaga.ms_exchange.model.Transaction;
 import com.aarteaga.ms_exchange.service.TransactionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> create(@RequestBody Transaction transaction) {
+    public ResponseEntity<Transaction> create(@RequestBody Transaction transaction) throws JsonProcessingException {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(transactionService.create(transaction));
