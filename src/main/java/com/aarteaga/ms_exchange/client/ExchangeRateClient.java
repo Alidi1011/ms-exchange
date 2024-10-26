@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(value = "exchange", url = "https://open.er-api.com/v6/latest")
+@FeignClient(value = "exchange", url="${exchange.api-url}")
 public interface ExchangeRateClient {
 
     @RequestMapping(method = RequestMethod.GET, value = "/{currency}", produces = "application/json")
