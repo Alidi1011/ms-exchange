@@ -32,19 +32,24 @@ public class TransactionServiceImpl implements TransactionService{
     public Transaction create(Transaction transaction) throws JsonProcessingException {
 
         Exchange exchange = exchangeRateClient.getExchangeByCurrency(transaction.getOriginCurrency());
-        log.info("RATES:  " + exchange.getRates());
+
+        log.info("RATES: {}", exchange.getRates());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonRates = objectMapper.writeValueAsString(exchange.getRates());
         Double exchangeRate = objectMapper.readTree(jsonRates).get(transaction.getDestinyCurrency()).asDouble();
 
-        log.info("RATE:  " + exchangeRate);
+        log.info("RATE: {}", exchangeRate);
 
         Double finalAmount = transaction.getInitialAmount() * exchangeRate;
-        transaction.setFinalAmount(finalAmount);
+
+        log.info("FINAL AMOUNT: {}", finalAmount);
+
+        Double finalAmountRounded =Math.round(finalAmount * 1000.0)/1000.0;
+
+        transaction.setFinalAmount(finalAmountRounded);
         transaction.setExchangeRate(exchangeRate);
         transaction.setTransactionDate(LocalDateTime.now());
-        transactionRepository.save(transaction);
 
         return transactionRepository.save(transaction);
     }

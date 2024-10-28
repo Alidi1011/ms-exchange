@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -35,7 +36,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> create(HttpServletRequest request, @RequestBody Transaction transaction) throws JsonProcessingException {
+    public ResponseEntity<Transaction> create(HttpServletRequest request, @Valid @RequestBody Transaction transaction) throws JsonProcessingException {
         String jwtToken = request.getHeader(HEADER_AUTHORIZACION_KEY).replace(TOKEN_BEARER_PREFIX, "");
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey(SUPER_SECRET_KEY))
